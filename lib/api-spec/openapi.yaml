@@ -9,6 +9,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: agent
+    description: Autonomous AI agent sessions with scope-gated tool permissions
+  - name: anthropic
+    description: Anthropic AI chat operations
   - name: dashboard
     description: Dashboard summary
   - name: guardduty
@@ -269,6 +273,247 @@ paths:
                 $ref: "#/components/schemas/VirusTotalResult"
         "400":
           description: Invalid IOC
+
+  /agent/sessions:
+    get:
+      operationId: listAgentSessions
+      tags: [agent]
+      summary: List all agent sessions
+      responses:
+        "200":
+          description: List of agent sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentSession"
+    post:
+      operationId: createAgentSession
+      tags: [agent]
+      summary: Create a new agent session with scope definition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgentSessionBody"
+      responses:
+        "201":
+          description: Created agent session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentSession"
+
+  /agent/sessions/{id}:
+    get:
+      operationId: getAgentSession
+      tags: [agent]
+      summary: Get an agent session with messages and tool invocations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Agent session detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentSessionDetail"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAgentSession
+      tags: [agent]
+      summary: Delete an agent session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /agent/sessions/{id}/run:
+    post:
+      operationId: runAgentSession
+      tags: [agent]
+      summary: Start autonomous agent run (SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: SSE stream of agent thoughts, tool calls, and results
+          content:
+            text/event-stream: {}
+        "404":
+          description: Not found
+
+  /agent/sessions/{id}/message:
+    post:
+      operationId: sendAgentMessage
+      tags: [agent]
+      summary: Send a message to the agent (SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendAgentMessageBody"
+      responses:
+        "200":
+          description: SSE stream of agent response
+          content:
+            text/event-stream: {}
+        "404":
+          description: Not found
+
+  /agent/sessions/{id}/tool-invocations:
+    get:
+      operationId: listToolInvocations
+      tags: [agent]
+      summary: List tool invocations for a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tool invocation log
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ToolInvocationRecord"
+
+  /anthropic/conversations:
+    get:
+      operationId: listAnthropicConversations
+      tags: [anthropic]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnthropicConversation"
+    post:
+      operationId: createAnthropicConversation
+      tags: [anthropic]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnthropicConversationBody"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicConversation"
+  /anthropic/conversations/{id}:
+    get:
+      operationId: getAnthropicConversation
+      tags: [anthropic]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicConversationWithMessages"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAnthropicConversation
+      tags: [anthropic]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+  /anthropic/conversations/{id}/messages:
+    get:
+      operationId: listAnthropicMessages
+      tags: [anthropic]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnthropicMessage"
+    post:
+      operationId: sendAnthropicMessage
+      tags: [anthropic]
+      summary: Send a message (SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendAnthropicMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant response chunks
+          content:
+            text/event-stream: {}
 
   /scans:
     get:
@@ -565,6 +810,214 @@ components:
         - resourceId
         - createdAt
         - updatedAt
+
+    AgentSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+        conversationId:
+          type: ["integer", "null"]
+        scopeInTargets:
+          type: string
+        scopeOutTargets:
+          type: string
+        conditions:
+          type: string
+        objectives:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - status
+        - conversationId
+        - scopeInTargets
+        - scopeOutTargets
+        - conditions
+        - objectives
+        - createdAt
+        - updatedAt
+
+    AgentSessionDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+        conversationId:
+          type: ["integer", "null"]
+        scopeInTargets:
+          type: string
+        scopeOutTargets:
+          type: string
+        conditions:
+          type: string
+        objectives:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnthropicMessage"
+        toolInvocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolInvocationRecord"
+      required:
+        - id
+        - name
+        - status
+        - conversationId
+        - scopeInTargets
+        - scopeOutTargets
+        - conditions
+        - objectives
+        - createdAt
+        - updatedAt
+        - messages
+        - toolInvocations
+
+    CreateAgentSessionBody:
+      type: object
+      properties:
+        name:
+          type: string
+        scopeInTargets:
+          type: array
+          items:
+            type: string
+        scopeOutTargets:
+          type: array
+          items:
+            type: string
+        conditions:
+          type: string
+        objectives:
+          type: string
+      required:
+        - name
+        - scopeInTargets
+        - objectives
+
+    SendAgentMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    ToolInvocationRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        sessionId:
+          type: integer
+        toolName:
+          type: string
+        toolInput:
+          type: string
+        toolOutput:
+          type: string
+        scopeAllowed:
+          type: boolean
+        scopeReason:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - sessionId
+        - toolName
+        - toolInput
+        - toolOutput
+        - scopeAllowed
+        - scopeReason
+        - createdAt
+
+    AnthropicConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - createdAt
+
+    AnthropicMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    CreateAnthropicConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    SendAnthropicMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    AnthropicConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnthropicMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
 
     VirusTotalResult:
       type: object

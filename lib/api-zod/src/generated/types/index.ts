@@ -7,8 +7,15 @@
  */
 
 export * from "./activityItem";
+export * from "./agentSession";
+export * from "./agentSessionDetail";
+export * from "./anthropicConversation";
+export * from "./anthropicConversationWithMessages";
+export * from "./anthropicMessage";
 export * from "./artifactFolder";
 export * from "./artifactObject";
+export * from "./createAgentSessionBody";
+export * from "./createAnthropicConversationBody";
 export * from "./dashboardSummary";
 export * from "./getLogEventsParams";
 export * from "./guardDutyFinding";
@@ -22,6 +29,9 @@ export * from "./logGroup";
 export * from "./presignedUrl";
 export * from "./s3Summary";
 export * from "./securityHubFinding";
+export * from "./sendAgentMessageBody";
+export * from "./sendAnthropicMessageBody";
 export * from "./serviceSummary";
+export * from "./toolInvocationRecord";
 export * from "./virusTotalLookupParams";
 export * from "./virusTotalResult";

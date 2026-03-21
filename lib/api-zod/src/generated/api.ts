@@ -249,6 +249,200 @@ export const VirusTotalLookupResponse = zod.object({
 });
 
 /**
+ * @summary List all agent sessions
+ */
+export const ListAgentSessionsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  status: zod.string(),
+  conversationId: zod.number().nullable(),
+  scopeInTargets: zod.string(),
+  scopeOutTargets: zod.string(),
+  conditions: zod.string(),
+  objectives: zod.string(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const ListAgentSessionsResponse = zod.array(
+  ListAgentSessionsResponseItem,
+);
+
+/**
+ * @summary Create a new agent session with scope definition
+ */
+export const CreateAgentSessionBody = zod.object({
+  name: zod.string(),
+  scopeInTargets: zod.array(zod.string()),
+  scopeOutTargets: zod.array(zod.string()).optional(),
+  conditions: zod.string().optional(),
+  objectives: zod.string(),
+});
+
+/**
+ * @summary Get an agent session with messages and tool invocations
+ */
+export const GetAgentSessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetAgentSessionResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  status: zod.string(),
+  conversationId: zod.number().nullable(),
+  scopeInTargets: zod.string(),
+  scopeOutTargets: zod.string(),
+  conditions: zod.string(),
+  objectives: zod.string(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      conversationId: zod.number(),
+      role: zod.string(),
+      content: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+  toolInvocations: zod.array(
+    zod.object({
+      id: zod.number(),
+      sessionId: zod.number(),
+      toolName: zod.string(),
+      toolInput: zod.string(),
+      toolOutput: zod.string(),
+      scopeAllowed: zod.boolean(),
+      scopeReason: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Delete an agent session
+ */
+export const DeleteAgentSessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Start autonomous agent run (SSE stream)
+ */
+export const RunAgentSessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Send a message to the agent (SSE stream)
+ */
+export const SendAgentMessageParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const SendAgentMessageBody = zod.object({
+  content: zod.string(),
+});
+
+/**
+ * @summary List tool invocations for a session
+ */
+export const ListToolInvocationsParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ListToolInvocationsResponseItem = zod.object({
+  id: zod.number(),
+  sessionId: zod.number(),
+  toolName: zod.string(),
+  toolInput: zod.string(),
+  toolOutput: zod.string(),
+  scopeAllowed: zod.boolean(),
+  scopeReason: zod.string(),
+  createdAt: zod.string(),
+});
+export const ListToolInvocationsResponse = zod.array(
+  ListToolInvocationsResponseItem,
+);
+
+/**
+ * @summary List all conversations
+ */
+export const ListAnthropicConversationsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.string(),
+});
+export const ListAnthropicConversationsResponse = zod.array(
+  ListAnthropicConversationsResponseItem,
+);
+
+/**
+ * @summary Create a new conversation
+ */
+export const CreateAnthropicConversationBody = zod.object({
+  title: zod.string(),
+});
+
+/**
+ * @summary Get conversation with messages
+ */
+export const GetAnthropicConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetAnthropicConversationResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.string(),
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      conversationId: zod.number(),
+      role: zod.string(),
+      content: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Delete a conversation
+ */
+export const DeleteAnthropicConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List messages in a conversation
+ */
+export const ListAnthropicMessagesParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ListAnthropicMessagesResponseItem = zod.object({
+  id: zod.number(),
+  conversationId: zod.number(),
+  role: zod.string(),
+  content: zod.string(),
+  createdAt: zod.string(),
+});
+export const ListAnthropicMessagesResponse = zod.array(
+  ListAnthropicMessagesResponseItem,
+);
+
+/**
+ * @summary Send a message (SSE stream)
+ */
+export const SendAnthropicMessageParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const SendAnthropicMessageBody = zod.object({
+  content: zod.string(),
+});
+
+/**
  * @summary List scan results from S3
  */
 export const ListScanResultsResponseItem = zod.object({

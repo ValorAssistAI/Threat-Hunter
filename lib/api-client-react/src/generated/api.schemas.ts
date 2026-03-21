@@ -127,6 +127,88 @@ export interface SecurityHubFinding {
   updatedAt: string;
 }
 
+export interface AgentSession {
+  id: number;
+  name: string;
+  status: string;
+  /** @nullable */
+  conversationId: number | null;
+  scopeInTargets: string;
+  scopeOutTargets: string;
+  conditions: string;
+  objectives: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AnthropicMessage {
+  id: number;
+  conversationId: number;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface ToolInvocationRecord {
+  id: number;
+  sessionId: number;
+  toolName: string;
+  toolInput: string;
+  toolOutput: string;
+  scopeAllowed: boolean;
+  scopeReason: string;
+  createdAt: string;
+}
+
+export interface AgentSessionDetail {
+  id: number;
+  name: string;
+  status: string;
+  /** @nullable */
+  conversationId: number | null;
+  scopeInTargets: string;
+  scopeOutTargets: string;
+  conditions: string;
+  objectives: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: AnthropicMessage[];
+  toolInvocations: ToolInvocationRecord[];
+}
+
+export interface CreateAgentSessionBody {
+  name: string;
+  scopeInTargets: string[];
+  scopeOutTargets?: string[];
+  conditions?: string;
+  objectives: string;
+}
+
+export interface SendAgentMessageBody {
+  content: string;
+}
+
+export interface AnthropicConversation {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
+export interface CreateAnthropicConversationBody {
+  title: string;
+}
+
+export interface SendAnthropicMessageBody {
+  content: string;
+}
+
+export interface AnthropicConversationWithMessages {
+  id: number;
+  title: string;
+  createdAt: string;
+  messages: AnthropicMessage[];
+}
+
 export interface VirusTotalResult {
   ioc: string;
   iocType: string;

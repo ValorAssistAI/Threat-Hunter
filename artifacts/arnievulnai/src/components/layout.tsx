@@ -32,6 +32,7 @@ export function Layout({ children, title }: LayoutProps) {
     { href: "/logs", label: "CloudWatch Logs", icon: TerminalSquare },
     { href: "/threat-intel", label: "Threat Intel", icon: AlertTriangle },
     { href: "/scans", label: "Scan Results", icon: Cpu },
+    { href: "/agent", label: "Autonomous Agent", icon: Bot },
   ];
 
   return (

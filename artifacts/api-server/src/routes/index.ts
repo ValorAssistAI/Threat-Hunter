@@ -8,6 +8,7 @@ import artifactsRouter from "./artifacts";
 import logsRouter from "./logs";
 import threatIntelRouter from "./threatintel";
 import scansRouter from "./scans";
+import agentRouter from "./agent";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(artifactsRouter);
 router.use(logsRouter);
 router.use(threatIntelRouter);
 router.use(scansRouter);
+router.use(agentRouter);
 
 export default router;
