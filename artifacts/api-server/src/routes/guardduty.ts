@@ -25,6 +25,12 @@ async function getDetectorId(): Promise<string | null> {
   return res.DetectorIds?.[0] ?? null;
 }
 
+function toIso(val: Date | string | undefined): string {
+  if (!val) return new Date().toISOString();
+  if (val instanceof Date) return val.toISOString();
+  return new Date(val).toISOString();
+}
+
 function mapFinding(f: Finding) {
   return {
     id: f.Id ?? "",
@@ -36,8 +42,8 @@ function mapFinding(f: Finding) {
     region: f.Region ?? "us-east-1",
     accountId: f.AccountId ?? "",
     resourceType: f.Resource?.ResourceType ?? null,
-    createdAt: f.CreatedAt?.toISOString() ?? new Date().toISOString(),
-    updatedAt: f.UpdatedAt?.toISOString() ?? new Date().toISOString(),
+    createdAt: toIso(f.CreatedAt),
+    updatedAt: toIso(f.UpdatedAt),
     count: f.Service?.Count ?? 1,
   };
 }
