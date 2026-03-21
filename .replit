@@ -24,3 +24,9 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+AWS_REGION = "us-east-1"
+ARNIEVULNAI_S3_BUCKET = "arnievulnai-artifacts"

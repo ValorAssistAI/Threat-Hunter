@@ -1,0 +1,15 @@
+packages:
+  "framer-motion": "For page transitions and smooth layout animations"
+  "date-fns": "For precise timestamp formatting in tables and logs"
+  "recharts": "For dashboard charts and visual summaries"
+  "clsx": "For conditional class merging"
+  "tailwind-merge": "For merging tailwind classes safely"
+
+images:
+  - path: "artifacts/arnievulnai/public/images/soc-bg.png"
+    description: "Deep dark abstract cybersecurity operations center background. Glowing subtle cyan and crimson data streams, grid lines, very minimal and premium."
+    aspect_ratio: "16:9"
+
+notes:
+  - All data fetching uses @workspace/api-client-react
+  - S3 artifact downloads use the raw getArtifactDownloadUrl function on click

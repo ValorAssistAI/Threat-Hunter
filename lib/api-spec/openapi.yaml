@@ -1,15 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ArnieAI Vulnerability Agent API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Dashboard summary
+  - name: guardduty
+    description: GuardDuty findings
+  - name: inspector
+    description: Inspector v2 findings
+  - name: securityhub
+    description: Security Hub findings
+  - name: artifacts
+    description: S3 artifact management
+  - name: logs
+    description: CloudWatch log access
+  - name: threat-intel
+    description: Threat intelligence and VirusTotal lookups
+  - name: scans
+    description: Scan results management
+
 paths:
   /healthz:
     get:
@@ -24,6 +40,251 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Dashboard summary
+      description: Returns high-level counts and status of all connected AWS services
+      responses:
+        "200":
+          description: Dashboard summary data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /security/guardduty/findings:
+    get:
+      operationId: listGuardDutyFindings
+      tags: [guardduty]
+      summary: List GuardDuty findings
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of GuardDuty findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuardDutyFinding"
+
+  /security/inspector/findings:
+    get:
+      operationId: listInspectorFindings
+      tags: [inspector]
+      summary: List Inspector v2 findings
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of Inspector findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InspectorFinding"
+
+  /security/securityhub/findings:
+    get:
+      operationId: listSecurityHubFindings
+      tags: [securityhub]
+      summary: List Security Hub findings
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of Security Hub findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SecurityHubFinding"
+
+  /artifacts:
+    get:
+      operationId: listArtifactFolders
+      tags: [artifacts]
+      summary: List S3 artifact folders with counts
+      responses:
+        "200":
+          description: S3 bucket folder listing
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactFolder"
+
+  /artifacts/{folder}:
+    get:
+      operationId: listArtifactsByFolder
+      tags: [artifacts]
+      summary: List objects in an S3 folder
+      parameters:
+        - name: folder
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of S3 objects in folder
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactObject"
+        "404":
+          description: Folder not found
+
+  /artifacts/{folder}/{key}/url:
+    get:
+      operationId: getArtifactDownloadUrl
+      tags: [artifacts]
+      summary: Get presigned download URL for an S3 object
+      parameters:
+        - name: folder
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Presigned URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PresignedUrl"
+
+  /logs/groups:
+    get:
+      operationId: listLogGroups
+      tags: [logs]
+      summary: List CloudWatch log groups
+      responses:
+        "200":
+          description: List of CloudWatch log groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogGroup"
+
+  /logs/events:
+    get:
+      operationId: getLogEvents
+      tags: [logs]
+      summary: Get log events from a CloudWatch log group
+      parameters:
+        - name: group
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+        - name: startTime
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Log events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEvent"
+
+  /threat-intel:
+    get:
+      operationId: listThreatIntelItems
+      tags: [threat-intel]
+      summary: List threat intelligence items from S3
+      responses:
+        "200":
+          description: Threat intel items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactObject"
+
+  /threat-intel/lookup:
+    get:
+      operationId: virusTotalLookup
+      tags: [threat-intel]
+      summary: Lookup a file hash or IP/domain on VirusTotal
+      parameters:
+        - name: ioc
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Hash (MD5/SHA1/SHA256), IP address, or domain to look up
+      responses:
+        "200":
+          description: VirusTotal analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VirusTotalResult"
+        "400":
+          description: Invalid IOC
+
+  /scans:
+    get:
+      operationId: listScanResults
+      tags: [scans]
+      summary: List scan results from S3
+      responses:
+        "200":
+          description: Scan results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArtifactObject"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +295,313 @@ components:
       required:
         - status
 
+    DashboardSummary:
+      type: object
+      properties:
+        guardduty:
+          $ref: "#/components/schemas/ServiceSummary"
+        inspector:
+          $ref: "#/components/schemas/ServiceSummary"
+        securityhub:
+          $ref: "#/components/schemas/ServiceSummary"
+        s3:
+          $ref: "#/components/schemas/S3Summary"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+      required:
+        - guardduty
+        - inspector
+        - securityhub
+        - s3
+        - recentActivity
+
+    ServiceSummary:
+      type: object
+      properties:
+        status:
+          type: string
+        total:
+          type: number
+        critical:
+          type: number
+        high:
+          type: number
+        medium:
+          type: number
+        low:
+          type: number
+      required:
+        - status
+        - total
+        - critical
+        - high
+        - medium
+        - low
+
+    S3Summary:
+      type: object
+      properties:
+        bucket:
+          type: string
+        folders:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArtifactFolder"
+      required:
+        - bucket
+        - folders
+
+    ArtifactFolder:
+      type: object
+      properties:
+        name:
+          type: string
+        count:
+          type: number
+        lastModified:
+          type: ["string", "null"]
+      required:
+        - name
+        - count
+        - lastModified
+
+    ArtifactObject:
+      type: object
+      properties:
+        key:
+          type: string
+        folder:
+          type: string
+        size:
+          type: number
+        lastModified:
+          type: string
+        etag:
+          type: ["string", "null"]
+      required:
+        - key
+        - folder
+        - size
+        - lastModified
+        - etag
+
+    PresignedUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        expiresIn:
+          type: number
+      required:
+        - url
+        - expiresIn
+
+    LogGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        retentionDays:
+          type: ["number", "null"]
+        storedBytes:
+          type: ["number", "null"]
+      required:
+        - name
+        - retentionDays
+        - storedBytes
+
+    LogEvent:
+      type: object
+      properties:
+        timestamp:
+          type: number
+        message:
+          type: string
+        ingestionTime:
+          type: ["number", "null"]
+      required:
+        - timestamp
+        - message
+        - ingestionTime
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        title:
+          type: string
+        severity:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - id
+        - source
+        - title
+        - severity
+        - timestamp
+
+    GuardDutyFinding:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        severity:
+          type: number
+        severityLabel:
+          type: string
+        type:
+          type: string
+        region:
+          type: string
+        accountId:
+          type: string
+        resourceType:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        count:
+          type: number
+      required:
+        - id
+        - title
+        - description
+        - severity
+        - severityLabel
+        - type
+        - region
+        - accountId
+        - resourceType
+        - createdAt
+        - updatedAt
+        - count
+
+    InspectorFinding:
+      type: object
+      properties:
+        arn:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        type:
+          type: string
+        resourceType:
+          type: ["string", "null"]
+        resourceId:
+          type: ["string", "null"]
+        cveId:
+          type: ["string", "null"]
+        cvssScore:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - arn
+        - title
+        - description
+        - severity
+        - status
+        - type
+        - resourceType
+        - resourceId
+        - cveId
+        - cvssScore
+        - createdAt
+        - updatedAt
+
+    SecurityHubFinding:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        severityScore:
+          type: number
+        status:
+          type: string
+        productName:
+          type: ["string", "null"]
+        resourceType:
+          type: ["string", "null"]
+        resourceId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - severity
+        - severityScore
+        - status
+        - productName
+        - resourceType
+        - resourceId
+        - createdAt
+        - updatedAt
+
+    VirusTotalResult:
+      type: object
+      properties:
+        ioc:
+          type: string
+        iocType:
+          type: string
+        malicious:
+          type: number
+        suspicious:
+          type: number
+        undetected:
+          type: number
+        harmless:
+          type: number
+        total:
+          type: number
+        reputation:
+          type: ["number", "null"]
+        lastAnalysisDate:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        permalink:
+          type: ["string", "null"]
+      required:
+        - ioc
+        - iocType
+        - malicious
+        - suspicious
+        - undetected
+        - harmless
+        - total
+        - reputation
+        - lastAnalysisDate
+        - tags
+        - permalink

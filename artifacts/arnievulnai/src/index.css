@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Force Dark Mode Theme for the SOC Vibe */
+  --color-background: hsl(240 10% 4%);
+  --color-foreground: hsl(0 0% 98%);
+  
+  --color-card: hsl(240 10% 6%);
+  --color-card-foreground: hsl(0 0% 98%);
+  
+  --color-popover: hsl(240 10% 6%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  
+  --color-primary: hsl(199 89% 48%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  --color-secondary: hsl(240 10% 12%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  
+  --color-muted: hsl(240 10% 12%);
+  --color-muted-foreground: hsl(240 5% 65%);
+  
+  --color-accent: hsl(240 10% 16%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  --color-border: hsl(240 10% 16%);
+  --color-input: hsl(240 10% 16%);
+  --color-ring: hsl(199 89% 48%);
+  
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.25rem;
+}
+
+:root {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 6%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 6%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 199 89% 48%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 10% 12%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 10% 12%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 240 10% 16%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 10% 16%;
+  --input: 240 10% 16%;
+  --ring: 199 89% 48%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30;
+    /* Deep grid pattern for SOC aesthetic */
+    background-image: 
+      linear-gradient(to right, hsl(240 10% 16% / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(240 10% 16% / 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  /* Custom Scrollbar for data-heavy views */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-card/60 backdrop-blur-xl border border-white/5 shadow-2xl shadow-black/50;
+  }
+  
+  .soc-card {
+    @apply bg-card rounded-xl border border-border/50 shadow-lg shadow-black/20 
+           hover:border-primary/30 transition-all duration-300 overflow-hidden;
+  }
+  
+  .soc-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 
+           text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm 
+           file:font-medium placeholder:text-muted-foreground 
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+           disabled:cursor-not-allowed disabled:opacity-50 transition-all;
+  }
+
+  .soc-button {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium 
+           ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
+           disabled:opacity-50 h-10 px-4 py-2 bg-primary text-primary-foreground 
+           hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(14,165,233,0.4)] active:scale-[0.98];
+  }
+  
+  .soc-button-secondary {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium 
+           ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
+           disabled:opacity-50 h-10 px-4 py-2 bg-secondary text-secondary-foreground 
+           hover:bg-secondary/80 border border-border hover:border-border/80 active:scale-[0.98];
+  }
+}
