@@ -47,3 +47,23 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Terraform state & secrets
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/*.tfplan
+infra/secrets.auto.tfvars
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+artifacts/api-server/dist/
+pino-pretty.log
+
+# Docker
+.dockerignore

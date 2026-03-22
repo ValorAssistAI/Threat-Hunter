@@ -1,0 +1,44 @@
+name: Database Migrations
+
+on:
+  workflow_call:
+    secrets:
+      DATABASE_URL:
+        required: true
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    name: Push Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Push schema to database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @workspace/db run push
+
+      - name: Verify tables
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          pnpm --filter @workspace/db exec node -e "
+            const { Pool } = require('pg');
+            const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+            pool.query(\"SELECT tablename FROM pg_tables WHERE schemaname='public'\")
+              .then(r => { console.log('Tables:', r.rows.map(t => t.tablename).join(', ')); pool.end(); })
+              .catch(e => { console.error(e); pool.end(); process.exit(1); });
+          "

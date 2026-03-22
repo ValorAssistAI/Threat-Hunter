@@ -1,0 +1,23 @@
+# ArnieAI Vulnerability Agent — Code Owners
+# Format: <pattern> <owner(s)>
+
+# Default owner for all files
+* @your-org/security-engineering
+
+# Infrastructure
+infra/ @your-org/platform-engineering @your-org/security-engineering
+
+# CI/CD pipelines
+.github/workflows/ @your-org/platform-engineering
+
+# API server
+artifacts/api-server/ @your-org/security-engineering
+
+# Frontend
+artifacts/arnievulnai/ @your-org/security-engineering
+
+# Database schema
+lib/db/ @your-org/platform-engineering @your-org/security-engineering
+
+# OpenAPI spec (codegen source of truth)
+lib/api-spec/ @your-org/security-engineering

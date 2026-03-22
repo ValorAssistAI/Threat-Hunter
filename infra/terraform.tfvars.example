@@ -1,0 +1,23 @@
+# Copy this to terraform.tfvars (gitignored) and fill in real values
+# Never commit terraform.tfvars — it contains secrets
+
+aws_region     = "us-east-1"
+aws_account_id = "973028704465"
+environment    = "production"
+
+# PostgreSQL connection string
+db_url = "postgresql://user:password@host:5432/arnievulnai"
+
+# VirusTotal API key (stored in Secrets Manager via Terraform)
+virustotal_api_key = ""
+
+# Network
+vpc_cidr = "10.0.0.0/16"
+
+# ECS task sizing
+api_task_cpu    = 512
+api_task_memory = 1024
+
+# Anthropic proxy (via Replit AI Integrations)
+ai_anthropic_base_url = ""
+ai_anthropic_api_key  = ""
